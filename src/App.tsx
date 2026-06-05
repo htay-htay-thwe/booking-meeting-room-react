@@ -19,7 +19,7 @@ import BookingListCard from "./components/BookingListCard";
 import UserManagementCard from "./components/UserManagementCard";
 import OwnerPanels from "./components/OwnerPanels";
 import ToastStack, { type ToastMessage } from "./components/ToastStack";
-import Sidebar from "./components/ui/sidebar";
+import Sidebar from "./components/ui/Sidebar";
 
 const emptyUser: User = { id: "", name: "", role: "user" };
 
