@@ -23,7 +23,7 @@ export async function apiFetch<T>(
 ): Promise<T> {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
-    ...((options.headers as Record<string, string>) || {})
+    ...((options.headers as Record<string, string>) || {}),
   };
 
   if (token) {
@@ -32,8 +32,16 @@ export async function apiFetch<T>(
 
   const response = await fetch(`${API_BASE}${path}`, {
     ...options,
-    headers
+    headers,
   });
+
+  // --- GLOBAL AUTH GUARD ---
+  if (response.status === 401) {
+    localStorage.removeItem("token");
+    window.location.href = "/";
+    throw new Error("Unauthorized");
+  }
+  // -------------------------
 
   const text = await response.text();
   const payload = safeJsonParse(text);
