@@ -12,7 +12,6 @@ interface BookingListCardProps {
 export default function BookingListCard({
   bookings,
   loading,
-  canDelete,
   deletingId,
   onDelete,
   formatDate

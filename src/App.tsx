@@ -256,7 +256,7 @@ export default function App() {
         <BrowserRouter>
             <Routes>
 
-                {/* PUBLIC ROUTE: Only the Login page. No Sidebar/TopBar here. */}
+                {/* PUBLIC ROUTE */}
                 <Route
                     path="/" element={
                         <PublicRoute>

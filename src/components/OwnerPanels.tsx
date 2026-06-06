@@ -31,7 +31,7 @@ export default function OwnerPanels({
           {!loading &&
             summary.map((item, index) => (
               <div
-                key={index} // Preferred unique string ID over index if available
+                key={index} 
                 className="flex items-center justify-between border-b border-stone-100 pb-3"
               >
                 <div>
