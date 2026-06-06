@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { apiFetch } from "./api";
 import type {
     AuthFormState,
@@ -138,33 +138,6 @@ export default function App() {
         if (isOwner) void loadOwnerData();
     }, [isAuthed, isAdmin, isOwner, loadBookings, loadUsers, loadOwnerData]);
 
-    const handleAuthSubmit = useCallback(
-        async (event: FormEvent<HTMLFormElement>) => {
-            event.preventDefault();
-            setAuthError("");
-            setAuthLoading(true);
-            const endpoint = authMode === "login" ? "/api/auth/login" : "/api/auth/register";
-            try {
-                const data = await apiFetch<{ token: string; user: User }>(endpoint, {
-                    method: "POST",
-                    body: JSON.stringify(authForm)
-                });
-                localStorage.setItem("token", data.token);
-                localStorage.setItem("currentUser", JSON.stringify(data.user));
-                setToken(data.token);
-                setUser(data.user);
-                setAuthForm({ name: "", password: "" });
-                <Navigate to="/dashboard" />;
-                pushToast("success", authMode === "login" ? "Welcome back." : "Account created.");
-            } catch (err) {
-                setAuthError((err as Error).message);
-            } finally {
-                setAuthLoading(false);
-            }
-        },
-        [authForm, authMode, pushToast]
-    );
-
     const handleLogout = useCallback(() => {
         localStorage.removeItem("token");
         localStorage.removeItem("currentUser");
@@ -289,9 +262,16 @@ export default function App() {
                         loading={authLoading}
                         onModeChange={setAuthMode}
                         onChange={(value) => setAuthForm(p => ({ ...p, ...value }))}
-                        onSubmit={handleAuthSubmit}
                         toasts={toasts}
                         onDismiss={dismissToast}
+                        setAuthError={setAuthError}
+                        setAuthLoading={setAuthLoading}
+                        setToken={setToken}
+                        setUser={setUser}
+                        setAuthForm={setAuthForm}
+                        authMode={authMode}
+                        authForm={authForm}
+                        pushToast={pushToast}
                     />
                 } />
 
