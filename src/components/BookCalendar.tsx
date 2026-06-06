@@ -9,7 +9,7 @@ const localizer = momentLocalizer(moment);
 export default function BookCalendar({ bookings }: { bookings: Booking[] }) {
     // Map your backend data to the format the Calendar needs
     const events = bookings.map(booking => ({
-        title: `user: ${booking.userName}`,
+        title: `Reserved: ${booking.userName}`,
         start: new Date(booking.startTime),
         end: new Date(booking.endTime),
     }));
