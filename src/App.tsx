@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { apiFetch } from "./api";
 import type {
     AuthFormState,
@@ -20,6 +20,7 @@ import ToastStack, { type ToastMessage } from "./components/ToastStack";
 import Sidebar from "./components/ui/Sidebar";
 import ProtectedRoute from "./ProtectedRoute";
 import Login from "./Login";
+import DashboardLayout from "./components/ui/DashboardLayout";
 
 const emptyUser: User = { id: "", name: "", role: "user" };
 
@@ -76,7 +77,7 @@ export default function App() {
         return new Set(
             bookings
                 .filter((booking) => isOwner || booking.userId === user.id)
-                .map((booking) => booking.id)
+                .map((booking) => booking._id)
         );
     }, [bookings, isOwner, user.id]);
 
@@ -293,76 +294,74 @@ export default function App() {
                     />
                 } />
 
-                {/* PRIVATE ROUTES: The Layout is only rendered here. */}
-                <Route path="/*" element={
-                    <ProtectedRoute>
-                        <div className="flex h-screen bg-stone-100 overflow-hidden">
-                            <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} userRole={user.role} />
 
-                            <main className="flex-1 overflow-y-auto p-7">
-                                <TopBar user={user} onLogout={handleLogout} />
+                <Route element={<ProtectedRoute />}>
+                    <Route element={
+                        <DashboardLayout
+                            user={user}
+                            isOpen={isOpen}
+                            setIsOpen={setIsOpen}
+                            handleLogout={handleLogout}
+                            toasts={toasts}
+                            dismissToast={dismissToast}
+                        />
+                    }>
 
-                                <div className="mt-8">
-                                    <Routes>
-                                        <Route path="/dashboard" element={
-                                            <section className="grid gap-5">
-                                                {((user.role === "user" || user.role === "owner") && (
-                                                    <BookingFormCard
-                                                        form={bookingForm}
-                                                        onChange={(v) => setBookingForm(p => ({ ...p, ...v }))}
-                                                        onSubmit={handleCreateBooking}
-                                                        error={bookingError}
-                                                        loading={bookingSaving}
-                                                    />
-                                                ))}
-                                                <BookingListCard
-                                                    bookings={bookings}
-                                                    onDelete={handleDeleteBooking}
-                                                    loading={bookingsLoading}
-                                                    canDelete={canDelete}
-                                                    deletingId={bookingDeletingId}
-                                                    formatDate={formatDate}
-                                                />
-                                            </section>
-                                        } />
+                        <Route path="/dashboard" element={
+                            <section className="grid gap-5">
+                                {((user.role === "user" || user.role === "owner") && (
+                                    <BookingFormCard
+                                        form={bookingForm}
+                                        onChange={(v) => setBookingForm(p => ({ ...p, ...v }))}
+                                        onSubmit={handleCreateBooking}
+                                        error={bookingError}
+                                        loading={bookingSaving}
+                                    />
+                                ))}
+                                <BookingListCard
+                                    bookings={bookings}
+                                    onDelete={handleDeleteBooking}
+                                    loading={bookingsLoading}
+                                    canDelete={canDelete}
+                                    deletingId={bookingDeletingId}
+                                    formatDate={formatDate}
+                                />
+                            </section>
+                        } />
 
-                                        {isAdmin && (
-                                            <Route path="/users" element={
-                                                <UserManagementCard
-                                                    users={users}
-                                                    user={user}
-                                                    form={userForm}
-                                                    onFormChange={(v) => setUserForm(p => ({ ...p, ...v }))}
-                                                    onCreate={handleCreateUser}
-                                                    onDelete={handleDeleteUser}
-                                                    handleRoleChange={handleRoleChange}
-                                                    error={userError}
-                                                    loading={usersLoading}
-                                                    saving={userSaving}
-                                                    deletingId={userDeletingId}
-                                                />
-                                            } />
-                                        )}
+                        {isAdmin && (
+                            <Route path="/users" element={
+                                <UserManagementCard
+                                    users={users}
+                                    user={user}
+                                    form={userForm}
+                                    onFormChange={(v) => setUserForm(p => ({ ...p, ...v }))}
+                                    onCreate={handleCreateUser}
+                                    onDelete={handleDeleteUser}
+                                    handleRoleChange={handleRoleChange}
+                                    error={userError}
+                                    loading={usersLoading}
+                                    saving={userSaving}
+                                    deletingId={userDeletingId}
+                                />
+                            } />
+                        )}
 
-                                        {isOwner && (
-                                            <Route path="/booking-list" element={
-                                                <OwnerPanels
-                                                    summary={summary}
-                                                    grouped={grouped}
-                                                    error={ownerError}
-                                                    loading={ownerLoading}
-                                                    formatDate={formatDate}
-                                                />
-                                            } />
-                                        )}
-                                    </Routes>
-                                </div>
-                            </main>
-                            <ToastStack toasts={toasts} onDismiss={dismissToast} />
-                        </div>
-                    </ProtectedRoute>
-                } />
+                        {isOwner && (
+                            <Route path="/booking-list" element={
+                                <OwnerPanels
+                                    summary={summary}
+                                    grouped={grouped}
+                                    error={ownerError}
+                                    loading={ownerLoading}
+                                    formatDate={formatDate}
+                                />
+                            } />
+                        )}
 
+                        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                    </Route>
+                </Route>
             </Routes>
         </BrowserRouter>
     );

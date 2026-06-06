@@ -7,7 +7,7 @@ export interface User {
 }
 
 export interface Booking {
-  id: string;
+  _id: string;
   userId: string;
   startTime: string;
   endTime: string;
