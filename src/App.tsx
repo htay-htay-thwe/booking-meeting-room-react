@@ -11,17 +11,16 @@ import type {
     UserFormState,
 } from "./types";
 
-import TopBar from "./components/TopBar";
 import BookingFormCard from "./components/BookingFormCard";
 import BookingListCard from "./components/BookingListCard";
 import UserManagementCard from "./components/UserManagementCard";
 import OwnerPanels from "./components/OwnerPanels";
 import ToastStack, { type ToastMessage } from "./components/ToastStack";
-import Sidebar from "./components/ui/Sidebar";
 import ProtectedRoute from "./ProtectedRoute";
 import Login from "./Login";
 import DashboardLayout from "./components/ui/DashboardLayout";
 import PublicRoute from "./PublicRoute";
+import BookCalendar from "./components/BookCalendar";
 
 const emptyUser: User = { id: "", name: "", role: "user" };
 
@@ -50,6 +49,7 @@ export default function App() {
     const [isOpen, setIsOpen] = useState(true);
 
     const [bookings, setBookings] = useState<Booking[]>([]);
+    const [bookingsAuth, setBookingsAuth] = useState<Booking[]>([]);
     const [bookingForm, setBookingForm] = useState<BookingFormState>({ startTime: "", endTime: "" });
     const [bookingError, setBookingError] = useState<string>("");
     const [bookingsLoading, setBookingsLoading] = useState(false);
@@ -99,6 +99,8 @@ export default function App() {
         try {
             const data = await apiFetch<Booking[]>("/api/bookings", {}, token);
             setBookings(data);
+            console.log("Fetched bookings:", data);
+            setBookingsAuth(data.filter(b => b.userId === user.id));
         } catch (err) {
             setBookingError((err as Error).message);
         } finally {
@@ -292,7 +294,8 @@ export default function App() {
                     }>
 
                         <Route path="/dashboard" element={
-                            <section className="grid gap-5">
+                            <section className="space-y-6 ">
+                                <BookCalendar bookings={bookings} />
                                 {((user.role === "user" || user.role === "owner") && (
                                     <BookingFormCard
                                         form={bookingForm}
@@ -303,7 +306,7 @@ export default function App() {
                                     />
                                 ))}
                                 <BookingListCard
-                                    bookings={bookings}
+                                    bookings={user.role === "user" ? bookingsAuth : bookings}
                                     onDelete={handleDeleteBooking}
                                     loading={bookingsLoading}
                                     canDelete={canDelete}
