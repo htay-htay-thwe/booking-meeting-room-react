@@ -154,6 +154,7 @@ export default function App() {
                 setToken(data.token);
                 setUser(data.user);
                 setAuthForm({ name: "", password: "" });
+                <Navigate to="/dashboard" />;
                 pushToast("success", authMode === "login" ? "Welcome back." : "Account created.");
             } catch (err) {
                 setAuthError((err as Error).message);
