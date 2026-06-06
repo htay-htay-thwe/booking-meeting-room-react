@@ -21,6 +21,7 @@ import Sidebar from "./components/ui/Sidebar";
 import ProtectedRoute from "./ProtectedRoute";
 import Login from "./Login";
 import DashboardLayout from "./components/ui/DashboardLayout";
+import PublicRoute from "./PublicRoute";
 
 const emptyUser: User = { id: "", name: "", role: "user" };
 
@@ -254,27 +255,29 @@ export default function App() {
             <Routes>
 
                 {/* PUBLIC ROUTE: Only the Login page. No Sidebar/TopBar here. */}
-                <Route path="/" element={
-                    <Login
-                        mode={authMode}
-                        form={authForm}
-                        error={authError}
-                        loading={authLoading}
-                        onModeChange={setAuthMode}
-                        onChange={(value) => setAuthForm(p => ({ ...p, ...value }))}
-                        toasts={toasts}
-                        onDismiss={dismissToast}
-                        setAuthError={setAuthError}
-                        setAuthLoading={setAuthLoading}
-                        setToken={setToken}
-                        setUser={setUser}
-                        setAuthForm={setAuthForm}
-                        authMode={authMode}
-                        authForm={authForm}
-                        pushToast={pushToast}
-                    />
-                } />
-
+                <Route
+                    path="/" element={
+                        <PublicRoute>
+                            <Login
+                                mode={authMode}
+                                form={authForm}
+                                error={authError}
+                                loading={authLoading}
+                                onModeChange={setAuthMode}
+                                onChange={(value) => setAuthForm(p => ({ ...p, ...value }))}
+                                toasts={toasts}
+                                onDismiss={dismissToast}
+                                setAuthError={setAuthError}
+                                setAuthLoading={setAuthLoading}
+                                setToken={setToken}
+                                setUser={setUser}
+                                setAuthForm={setAuthForm}
+                                authMode={authMode}
+                                authForm={authForm}
+                                pushToast={pushToast}
+                            />
+                        </PublicRoute>
+                    } />
 
                 <Route element={<ProtectedRoute />}>
                     <Route element={

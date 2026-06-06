@@ -31,7 +31,7 @@ export default function OwnerPanels({
           {!loading &&
             summary.map((item, index) => (
               <div
-                key={ index} // Preferred unique string ID over index if available
+                key={index} // Preferred unique string ID over index if available
                 className="flex items-center justify-between border-b border-stone-100 pb-3"
               >
                 <div>
@@ -43,6 +43,12 @@ export default function OwnerPanels({
                 </span>
               </div>
             ))}
+
+          {!loading && summary.length === 0 && (
+            <p className="text-sm text-stone-500 py-4 text-center">
+              No usage data available.
+            </p>
+          )}
         </div>
       </div>
       <div className="card col-span-full">
@@ -77,6 +83,12 @@ export default function OwnerPanels({
                 ))}
               </div>
             ))}
+
+          {!loading && grouped.length === 0 && (
+            <p className="text-sm text-stone-500 py-4 text-center">
+              No booking data available.
+            </p>
+          )}
         </div>
       </div>
     </section>
